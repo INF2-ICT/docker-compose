@@ -1,13 +1,15 @@
 # Use root/example as user/password credentials
 version: '3.1'
-
 services:
 
   db:
     image: mariadb
+    container_name: mariadb
     restart: unless-stopped
     environment:
       MARIADB_ROOT_PASSWORD: example
+    volumes:
+    - ./mysql/assets/quintor_11.sql:/docker-entrypoint-initdb.d/quintor_11.sql
     ports:
       - 3306:3306
       
@@ -19,6 +21,7 @@ services:
 
   mongo:
     image: mongo
+    container_name: mongodb
     restart: unless-stopped
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
@@ -37,4 +40,32 @@ services:
       ME_CONFIG_MONGODB_ADMINUSERNAME: root
       ME_CONFIG_MONGODB_ADMINPASSWORD: example
       ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo:27017/
+
+  api:
+    restart: unless-stopped
+    container_name: api
+    volumes:
+      - ../api:/app
+      - ../.env:/app/.env
+    build:
+      context: ../api
+      dockerfile: Dockerfile
+      cache_from:
+        - api:cache
+    ports:
+      - 8083:8083
+
+  parser:
+    restart: unless-stopped
+    container_name: parser
+    volumes:
+      - ../parser:/app
+      - ../.env:/app/.env
+    build:
+      context: ../parser
+      dockerfile: Dockerfile
+      cache_from:
+        - parser:cache
+    ports:
+      - 8082:8082
 

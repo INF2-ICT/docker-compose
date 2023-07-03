@@ -165,4 +165,18 @@ CREATE TABLE `cash_flow` (
 DROP TABLE IF EXISTS `get_all_transactions`;
 CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `get_all_transactions` AS select `transaction`.`ID` AS `id`,`transaction`.`transaction_reference` AS `transaction_reference`,`transaction`.`value_date` AS `value_date`,`transaction`.`transaction_type` AS `transaction_type`,`transaction`.`amount_in_euro` AS `amount_in_euro` from `transaction`;
 
+DROP USER IF EXISTS 'read_only_user'@'%';
+CREATE USER 'read_only_user'@'%' IDENTIFIED BY 'user123';
+GRANT SELECT, SHOW VIEW ON quintor.get_all_transactions TO 'read_only_user'@'%';
+GRANT EXECUTE ON PROCEDURE quintor.add_cash TO 'read_only_user'@'%';
+GRANT EXECUTE ON PROCEDURE quintor.add_transaction TO 'read_only_user'@'%';
+GRANT EXECUTE ON PROCEDURE quintor.add_MT940 TO 'read_only_user'@'%';
+
+DROP USER IF EXISTS 'treasurer'@'%';
+CREATE USER 'treasurer'@'%' IDENTIFIED BY 'treasurer123';
+GRANT SELECT, CREATE, UPDATE, DELETE, INSERT, SHOW VIEW, CREATE VIEW, TRIGGER, REFERENCES, ALTER ON quintor.* TO 'treasurer'@'%';
+GRANT EXECUTE ON PROCEDURE quintor.add_cash TO 'treasurer'@'%';
+GRANT EXECUTE ON PROCEDURE quintor.add_transaction TO 'treasurer'@'%';
+GRANT EXECUTE ON PROCEDURE quintor.add_MT940 TO 'treasurer'@'%';
+
 -- 2023-04-07 07:34:26

@@ -118,16 +118,6 @@ BEGIN
     );
 END;;
 
-CREATE PROCEDURE `update_transaction_comment`(
-    IN transaction_id INT,
-    IN new_comment VARCHAR(500)
-)
-BEGIN
-    UPDATE `transaction`
-    SET `user_comment` = new_comment
-    WHERE `ID` = transaction_id;
-END;;
-
 DELIMITER ;
 
 DROP TABLE IF EXISTS `cash_flow`;
@@ -260,7 +250,7 @@ CREATE TABLE `transaction` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 INSERT INTO `transaction` (`ID`, `transaction_reference`, `value_date`, `entry_date`, `transaction_type`, `fund_code`, `amount_in_euro`, `identifier_code`, `owner_reference`, `beneficiary_reference`, `supplementary_details`, `line1`, `line2`, `line3`, `line4`, `line5`, `line6`, `user_comment`) VALUES
-(1,	'P140220000000001',	'2014-02-20',	'2014-02-20',	'C',	'null',	1.56,	'TRF',	'EREF',	'00000000001005',	'/TRCD/00100/',	'/EREF/EV12341REP1231456T1234//CNTP/NL32INGB0000012345/INGBNL2',	'A/ING BANK NV INZAKE WEB///REMI/USTD//EV10001REP1000000T1000/',	'null',	'null',	'null',	'null',	'Hey is een test of dit werktt'),
+(1,	'P140220000000001',	'2014-02-20',	'2014-02-20',	'C',	'null',	1.56,	'TRF',	'EREF',	'00000000001005',	'/TRCD/00100/',	'/EREF/EV12341REP1231456T1234//CNTP/NL32INGB0000012345/INGBNL2',	'A/ING BANK NV INZAKE WEB///REMI/USTD//EV10001REP1000000T1000/',	'null',	'null',	'null',	'null',	'Transactie van het een en het ander'),
 (2,	'P140220000000001',	'2014-02-20',	'2014-02-20',	'D',	'null',	1.57,	'TRF',	'PREF',	'00000000001006',	'/TRCD/00200/',	'/PREF/M000000003333333//REMI/USTD//TOTAAL 1 VZ/',	'null',	'null',	'null',	'null',	'null',	NULL),
 (3,	'P140220000000001',	'2014-02-20',	'2014-02-20',	'C',	'null',	1.57,	'RTI',	'EREF',	'00000000001007',	'/TRCD/00190/',	'/RTRN/MS03//EREF/20120123456789//CNTP/NL32INGB0000012345/INGB',	'NL2A/J.Janssen///REMI/USTD//Factuurnr 123456 Klantnr 00123/',	'null',	'null',	'null',	'null',	NULL),
 (4,	'P140220000000001',	'2014-02-20',	'2014-02-20',	'D',	'null',	1.14,	'DDT',	'EREF',	'00000000001009',	'/TRCD/01016/',	'/EREF/EV123REP123412T1234//MARF/MND-EV01//CSID/NL32ZZZ9999999',	'91234//CNTP/NL32INGB0000012345/INGBNL2A/ING Bank N.V. inzake WeB/',	'//REMI/USTD//EV123REP123412T1234/',	'null',	'null',	'null',	NULL),
@@ -318,4 +308,4 @@ INSERT INTO `user` (`ID`, `role_ID`, `first_name`, `last_name`, `email`, `passwo
 DROP TABLE IF EXISTS `get_all_transactions`;
 CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `get_all_transactions` AS select `transaction`.`ID` AS `id`,`transaction`.`transaction_reference` AS `transaction_reference`,`transaction`.`value_date` AS `value_date`,`transaction`.`transaction_type` AS `transaction_type`,`transaction`.`amount_in_euro` AS `amount_in_euro` from `transaction`;
 
--- 2023-07-05 18:44:17
+-- 2023-07-03 20:38:32

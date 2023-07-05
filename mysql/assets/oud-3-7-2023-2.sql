@@ -13,23 +13,19 @@ USE `quintor`;
 
 DELIMITER ;;
 
+DROP PROCEDURE IF EXISTS `add_cash`;;
 CREATE DEFINER=`root`@`localhost` PROCEDURE `add_cash`(IN `amount` DOUBLE(8,2), IN `description` VARCHAR(100), IN `DateAndTime` datetime)
 INSERT INTO `cash_flow`(`amount`, `description`, `DateAndTime`) VALUES (amount, description, DateAndTime);;
 
+DROP PROCEDURE IF EXISTS `add_MT940`;;
 CREATE DEFINER=`root`@`localhost` PROCEDURE `add_MT940`(IN `reference` VARCHAR(16), IN `account` VARCHAR(33), IN `statementNR` VARCHAR(5), IN `sequenceNR` VARCHAR(5), IN `type` ENUM('C','D'), IN `date` DATE, IN `currency` VARCHAR(3), IN `start` DOUBLE(17,2), IN `final` DOUBLE(17,2))
 INSERT INTO `statements`(`transaction_reference`, `account`, `statement_number`, `sequence_number`, `transaction_type`, `date`, `currency`, `starting_balance`, `final_balance`) VALUES (reference, account, statementNR, sequenceNR, type, date, currency, start, final);;
 
+DROP PROCEDURE IF EXISTS `add_transaction`;;
 CREATE DEFINER=`root`@`localhost` PROCEDURE `add_transaction`(IN `reference` VARCHAR(16), IN `value_date` DATE, IN `entry_date` DATE, IN `type` ENUM('C','D'), IN `fund_code` VARCHAR(4), IN `amount` DOUBLE(17,2), IN `id_code` VARCHAR(4), IN `owner_ref` VARCHAR(35), IN `benef_ref` VARCHAR(35), IN `supplementary` VARCHAR(34), IN `line1` VARCHAR(65), IN `line2` VARCHAR(65), IN `line3` VARCHAR(65), IN `line4` VARCHAR(65), IN `line5` VARCHAR(65), IN `line6` VARCHAR(65))
 INSERT INTO `transaction`(`transaction_reference`, `value_date`, `entry_date`, `transaction_type`, `fund_code`, `amount_in_euro`, `identifier_code`, `owner_reference`, `beneficiary_reference`, `supplementary_details`, `line1`, `line2`, `line3`, `line4`, `line5`, `line6`) VALUES (reference, value_date, entry_date, type, fund_code, amount, id_code, owner_ref, benef_ref, supplementary, line1, line2, line3, line4, line5, line6);;
 
-CREATE PROCEDURE `delete_transaction`(
-    IN transaction_id INT
-)
-BEGIN
-    DELETE FROM `transaction`
-    WHERE `ID` = transaction_id;
-END;;
-
+DROP PROCEDURE IF EXISTS `get_single_transaction`;;
 CREATE PROCEDURE `get_single_transaction`(IN `input_id` int)
 BEGIN
     SELECT 
@@ -47,6 +43,7 @@ BEGIN
         `transaction`.`ID` = input_id;
 END;;
 
+DROP PROCEDURE IF EXISTS `insert_transaction`;;
 CREATE PROCEDURE `insert_transaction`(
     IN amount_in_euro DECIMAL(17,2),
     IN transaction_reference VARCHAR(16),
@@ -116,16 +113,6 @@ BEGIN
         NULL,
         user_comment
     );
-END;;
-
-CREATE PROCEDURE `update_transaction_comment`(
-    IN transaction_id INT,
-    IN new_comment VARCHAR(500)
-)
-BEGIN
-    UPDATE `transaction`
-    SET `user_comment` = new_comment
-    WHERE `ID` = transaction_id;
 END;;
 
 DELIMITER ;
@@ -229,10 +216,7 @@ INSERT INTO `statements` (`ID`, `transaction_reference`, `account`, `statement_n
 (3,	'P140220000000001',	'NL69INGB0123456789EUR',	'00000',	'null',	'C',	'2014-02-19',	'EUR',	662.23,	564.35),
 (4,	'P140220000000001',	'NL69INGB0123456789EUR',	'00000',	'null',	'C',	'2014-02-19',	'EUR',	662.23,	564.35),
 (5,	'test',	'',	'',	'',	'C',	'2023-07-02',	'',	2.50,	2.50),
-(6,	'test',	'',	'',	'',	'C',	'2023-07-02',	'',	2.50,	2.50),
-(7,	'heyhoi',	'',	'',	'',	'C',	'2023-07-03',	'',	12.00,	12.00),
-(8,	'heyhoi',	'',	'',	'',	'C',	'2023-07-03',	'',	12.00,	12.00),
-(9,	'asd',	'',	'',	'',	'C',	'2023-07-03',	'',	15.00,	15.00);
+(6,	'test',	'',	'',	'',	'C',	'2023-07-02',	'',	2.50,	2.50);
 
 DROP TABLE IF EXISTS `transaction`;
 CREATE TABLE `transaction` (
@@ -260,7 +244,7 @@ CREATE TABLE `transaction` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 INSERT INTO `transaction` (`ID`, `transaction_reference`, `value_date`, `entry_date`, `transaction_type`, `fund_code`, `amount_in_euro`, `identifier_code`, `owner_reference`, `beneficiary_reference`, `supplementary_details`, `line1`, `line2`, `line3`, `line4`, `line5`, `line6`, `user_comment`) VALUES
-(1,	'P140220000000001',	'2014-02-20',	'2014-02-20',	'C',	'null',	1.56,	'TRF',	'EREF',	'00000000001005',	'/TRCD/00100/',	'/EREF/EV12341REP1231456T1234//CNTP/NL32INGB0000012345/INGBNL2',	'A/ING BANK NV INZAKE WEB///REMI/USTD//EV10001REP1000000T1000/',	'null',	'null',	'null',	'null',	'Hey is een test of dit werktt'),
+(1,	'P140220000000001',	'2014-02-20',	'2014-02-20',	'C',	'null',	1.56,	'TRF',	'EREF',	'00000000001005',	'/TRCD/00100/',	'/EREF/EV12341REP1231456T1234//CNTP/NL32INGB0000012345/INGBNL2',	'A/ING BANK NV INZAKE WEB///REMI/USTD//EV10001REP1000000T1000/',	'null',	'null',	'null',	'null',	'Transactie van het een en het ander'),
 (2,	'P140220000000001',	'2014-02-20',	'2014-02-20',	'D',	'null',	1.57,	'TRF',	'PREF',	'00000000001006',	'/TRCD/00200/',	'/PREF/M000000003333333//REMI/USTD//TOTAAL 1 VZ/',	'null',	'null',	'null',	'null',	'null',	NULL),
 (3,	'P140220000000001',	'2014-02-20',	'2014-02-20',	'C',	'null',	1.57,	'RTI',	'EREF',	'00000000001007',	'/TRCD/00190/',	'/RTRN/MS03//EREF/20120123456789//CNTP/NL32INGB0000012345/INGB',	'NL2A/J.Janssen///REMI/USTD//Factuurnr 123456 Klantnr 00123/',	'null',	'null',	'null',	'null',	NULL),
 (4,	'P140220000000001',	'2014-02-20',	'2014-02-20',	'D',	'null',	1.14,	'DDT',	'EREF',	'00000000001009',	'/TRCD/01016/',	'/EREF/EV123REP123412T1234//MARF/MND-EV01//CSID/NL32ZZZ9999999',	'91234//CNTP/NL32INGB0000012345/INGBNL2A/ING Bank N.V. inzake WeB/',	'//REMI/USTD//EV123REP123412T1234/',	'null',	'null',	'null',	NULL),
@@ -318,4 +302,4 @@ INSERT INTO `user` (`ID`, `role_ID`, `first_name`, `last_name`, `email`, `passwo
 DROP TABLE IF EXISTS `get_all_transactions`;
 CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `get_all_transactions` AS select `transaction`.`ID` AS `id`,`transaction`.`transaction_reference` AS `transaction_reference`,`transaction`.`value_date` AS `value_date`,`transaction`.`transaction_type` AS `transaction_type`,`transaction`.`amount_in_euro` AS `amount_in_euro` from `transaction`;
 
--- 2023-07-05 18:44:17
+-- 2023-07-03 09:38:11

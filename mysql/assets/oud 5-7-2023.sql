@@ -118,17 +118,17 @@ BEGIN
     );
 END;;
 
-CREATE PROCEDURE `update_transaction_comment`(
-    IN transaction_id INT,
-    IN new_comment VARCHAR(500)
-)
-BEGIN
-    UPDATE `transaction`
-    SET `user_comment` = new_comment
-    WHERE `ID` = transaction_id;
-END;;
-
 DELIMITER ;
+
+DROP TABLE IF EXISTS `cash_flow`;
+CREATE TABLE `cash_flow` (
+  `id` int(255) NOT NULL AUTO_INCREMENT,
+  `amount` double(8,2) NOT NULL,
+  `descripton` varchar(100) NOT NULL,
+  `datetime` datetime NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 
 DROP VIEW IF EXISTS `get_all_transactions`;
 CREATE TABLE `get_all_transactions` (`id` int(10), `transaction_reference` varchar(16), `value_date` date, `transaction_type` enum('C','D'), `amount_in_euro` double(17,2));
@@ -172,10 +172,6 @@ CREATE TABLE `membership_payment` (
   CONSTRAINT `FK_memberID` FOREIGN KEY (`member_ID`) REFERENCES `member` (`ID`),
   CONSTRAINT `FK_transactionID` FOREIGN KEY (`transaction_ID`) REFERENCES `transaction` (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
-
-DROP VIEW IF EXISTS `membership_payments`;
-CREATE TABLE `membership_payments` (`member_id` int(6), `IBAN` varchar(33), `email` varchar(125), `first_name` varchar(15), `middle_name` varchar(15), `last_name` varchar(35), `membership_type` varchar(25), `price_per_month` double(4,2), `payment_term` int(3), `invoice_reference` varchar(8), `transaction_ID` int(10), `transaction_reference` varchar(16), `value_date` date, `entry_date` date, `amount_in_euro` double(17,2));
 
 
 DROP TABLE IF EXISTS `membership_type`;
@@ -228,10 +224,6 @@ INSERT INTO `statements` (`ID`, `transaction_reference`, `account`, `statement_n
 (8,	'heyhoi',	'',	'',	'',	'C',	'2023-07-03',	'',	12.00,	12.00),
 (9,	'asd',	'',	'',	'',	'C',	'2023-07-03',	'',	15.00,	15.00);
 
-DROP VIEW IF EXISTS `stetement_transaction`;
-CREATE TABLE `stetement_transaction` (`transaction_reference` varchar(16), `account` varchar(33), `statement_number` varchar(5), `sequence_number` varchar(5), `transaction_type_statements` enum('C','D'), `statement_date` date, `currency` varchar(3), `starting_balance` double(17,2), `final_balance` double(17,2), `value_date` date, `entry_date` date, `transaction_type_transaction` enum('C','D'), `fund_code` varchar(255), `amount_in_euro` double(17,2), `identifier_code` varchar(4), `owner_reference` varchar(35), `beneficiary_reference` varchar(35), `supplementary_details` varchar(34), `line1` varchar(65), `line2` varchar(65), `line3` varchar(65), `line4` varchar(65), `line5` varchar(65), `line6` varchar(65), `user_comment` varchar(500));
-
-
 DROP TABLE IF EXISTS `transaction`;
 CREATE TABLE `transaction` (
   `ID` int(10) NOT NULL AUTO_INCREMENT,
@@ -258,7 +250,7 @@ CREATE TABLE `transaction` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 INSERT INTO `transaction` (`ID`, `transaction_reference`, `value_date`, `entry_date`, `transaction_type`, `fund_code`, `amount_in_euro`, `identifier_code`, `owner_reference`, `beneficiary_reference`, `supplementary_details`, `line1`, `line2`, `line3`, `line4`, `line5`, `line6`, `user_comment`) VALUES
-(1,	'P140220000000001',	'2014-02-20',	'2014-02-20',	'C',	'null',	1.56,	'TRF',	'EREF',	'00000000001005',	'/TRCD/00100/',	'/EREF/EV12341REP1231456T1234//CNTP/NL32INGB0000012345/INGBNL2',	'A/ING BANK NV INZAKE WEB///REMI/USTD//EV10001REP1000000T1000/',	'null',	'null',	'null',	'null',	'Hey is een test of dit werktt'),
+(1,	'P140220000000001',	'2014-02-20',	'2014-02-20',	'C',	'null',	1.56,	'TRF',	'EREF',	'00000000001005',	'/TRCD/00100/',	'/EREF/EV12341REP1231456T1234//CNTP/NL32INGB0000012345/INGBNL2',	'A/ING BANK NV INZAKE WEB///REMI/USTD//EV10001REP1000000T1000/',	'null',	'null',	'null',	'null',	'Transactie van het een en het ander'),
 (2,	'P140220000000001',	'2014-02-20',	'2014-02-20',	'D',	'null',	1.57,	'TRF',	'PREF',	'00000000001006',	'/TRCD/00200/',	'/PREF/M000000003333333//REMI/USTD//TOTAAL 1 VZ/',	'null',	'null',	'null',	'null',	'null',	NULL),
 (3,	'P140220000000001',	'2014-02-20',	'2014-02-20',	'C',	'null',	1.57,	'RTI',	'EREF',	'00000000001007',	'/TRCD/00190/',	'/RTRN/MS03//EREF/20120123456789//CNTP/NL32INGB0000012345/INGB',	'NL2A/J.Janssen///REMI/USTD//Factuurnr 123456 Klantnr 00123/',	'null',	'null',	'null',	'null',	NULL),
 (4,	'P140220000000001',	'2014-02-20',	'2014-02-20',	'D',	'null',	1.14,	'DDT',	'EREF',	'00000000001009',	'/TRCD/01016/',	'/EREF/EV123REP123412T1234//MARF/MND-EV01//CSID/NL32ZZZ9999999',	'91234//CNTP/NL32INGB0000012345/INGBNL2A/ING Bank N.V. inzake WeB/',	'//REMI/USTD//EV123REP123412T1234/',	'null',	'null',	'null',	NULL),
@@ -292,31 +284,6 @@ INSERT INTO `transaction` (`ID`, `transaction_reference`, `value_date`, `entry_d
 (32,	'P140220000000001',	'2014-02-20',	'2014-02-20',	'D',	'null',	119.00,	'TRF',	'1070123412341234',	'00000000001012',	'/TRCD/00108/',	'/EREF/15614016000384600//CNTP/NL32INGB0000012345/INGBNL2A/ING',	'BANK NV///REMI/STRD/CUR/1070123412341234/',	'null',	'null',	'null',	'null',	NULL),
 (37,	'test',	'2014-02-19',	'2023-07-02',	'C',	NULL,	2.50,	'',	'',	'',	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	NULL,	'hey het werkt');
 
-DELIMITER ;;
-
-CREATE TRIGGER `calculate_total_amount` AFTER INSERT ON `transaction` FOR EACH ROW
-BEGIN
-    DECLARE total_amount DECIMAL(17,2);
-
-    -- Calculate the total amount for 'C' transactions
-    SELECT SUM(amount_in_euro)
-    INTO total_amount
-    FROM `transaction`
-    WHERE transaction_type = 'C';
-
-    -- Update the total_amount in the summary table
-    UPDATE transaction_summary
-    SET total_amount_credits = total_amount;
-END;;
-
-DELIMITER ;
-
-DROP TABLE IF EXISTS `transaction_summary`;
-CREATE TABLE `transaction_summary` (
-  `total_amount_credits` decimal(17,2) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
-
 DROP TABLE IF EXISTS `user`;
 CREATE TABLE `user` (
   `ID` int(3) NOT NULL AUTO_INCREMENT,
@@ -341,44 +308,4 @@ INSERT INTO `user` (`ID`, `role_ID`, `first_name`, `last_name`, `email`, `passwo
 DROP TABLE IF EXISTS `get_all_transactions`;
 CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `get_all_transactions` AS select `transaction`.`ID` AS `id`,`transaction`.`transaction_reference` AS `transaction_reference`,`transaction`.`value_date` AS `value_date`,`transaction`.`transaction_type` AS `transaction_type`,`transaction`.`amount_in_euro` AS `amount_in_euro` from `transaction`;
 
-DROP TABLE IF EXISTS `membership_payments`;
-CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `membership_payments` AS select `m`.`ID` AS `member_id`,`m`.`IBAN` AS `IBAN`,`m`.`email` AS `email`,`m`.`first_name` AS `first_name`,`m`.`middle_name` AS `middle_name`,`m`.`last_name` AS `last_name`,`mt`.`name` AS `membership_type`,`mt`.`price_per_month` AS `price_per_month`,`mt`.`payment_term` AS `payment_term`,`i`.`reference` AS `invoice_reference`,`mp`.`transaction_ID` AS `transaction_ID`,`t`.`transaction_reference` AS `transaction_reference`,`t`.`value_date` AS `value_date`,`t`.`entry_date` AS `entry_date`,`t`.`amount_in_euro` AS `amount_in_euro` from ((((`member` `m` join `membership_type` `mt` on(`m`.`membership_ID` = `mt`.`ID`)) left join `invoice` `i` on(`m`.`ID` = `i`.`member_ID`)) left join `membership_payment` `mp` on(`m`.`ID` = `mp`.`member_ID`)) left join `transaction` `t` on(`mp`.`transaction_ID` = `t`.`ID`));
-
-DROP TABLE IF EXISTS `stetement_transaction`;
-CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `stetement_transaction` AS select `statements`.`transaction_reference` AS `transaction_reference`,`statements`.`account` AS `account`,`statements`.`statement_number` AS `statement_number`,`statements`.`sequence_number` AS `sequence_number`,`statements`.`transaction_type` AS `transaction_type_statements`,`statements`.`date` AS `statement_date`,`statements`.`currency` AS `currency`,`statements`.`starting_balance` AS `starting_balance`,`statements`.`final_balance` AS `final_balance`,`transaction`.`value_date` AS `value_date`,`transaction`.`entry_date` AS `entry_date`,`transaction`.`transaction_type` AS `transaction_type_transaction`,`transaction`.`fund_code` AS `fund_code`,`transaction`.`amount_in_euro` AS `amount_in_euro`,`transaction`.`identifier_code` AS `identifier_code`,`transaction`.`owner_reference` AS `owner_reference`,`transaction`.`beneficiary_reference` AS `beneficiary_reference`,`transaction`.`supplementary_details` AS `supplementary_details`,`transaction`.`line1` AS `line1`,`transaction`.`line2` AS `line2`,`transaction`.`line3` AS `line3`,`transaction`.`line4` AS `line4`,`transaction`.`line5` AS `line5`,`transaction`.`line6` AS `line6`,`transaction`.`user_comment` AS `user_comment` from (`statements` join `transaction` on(`statements`.`transaction_reference` = `transaction`.`transaction_reference`));
-
-DROP USER IF EXISTS 'regular_user'@'%';
-CREATE USER 'read_only_user'@'%' IDENTIFIED BY '!user123';
-GRANT SELECT, SHOW VIEW ON quintor.get_all_transactions TO 'read_only_user'@'%';
-GRANT EXECUTE ON PROCEDURE quintor.add_cash TO 'read_only_user'@'%';
-GRANT EXECUTE ON PROCEDURE quintor.add_MT940 TO 'read_only_user'@'%';
-GRANT EXECUTE ON PROCEDURE quintor.add_transaction TO 'read_only_user'@'%';
-GRANT EXECUTE ON PROCEDURE quintor.get_single_transaction TO 'read_only_user'@'%';
-GRANT EXECUTE ON PROCEDURE quintor.insert_transaction TO 'read_only_user'@'%';
-GRANT EXECUTE ON PROCEDURE quintor.update_transaction_comment TO 'read_only_user'@'%';
-
-
-DROP USER IF EXISTS 'treasurer'@'%';
-CREATE USER 'treasurer'@'%' IDENTIFIED BY '!treasurer123';
-GRANT SELECT, CREATE, UPDATE, DELETE, INSERT, SHOW VIEW, CREATE VIEW, TRIGGER, REFERENCES, ALTER ON quintor.* TO 'treasurer'@'%';
-GRANT EXECUTE ON PROCEDURE quintor.* TO 'treasurer'@'%';
-
-<<<<<<< HEAD
-DROP USER IF EXISTS 'read_only_user'@'%';
-CREATE USER 'read_only_user'@'%' IDENTIFIED BY 'user123';
-GRANT SELECT, SHOW VIEW ON quintor.get_all_transactions TO 'read_only_user'@'%';
-GRANT EXECUTE ON PROCEDURE quintor.add_cash TO 'read_only_user'@'%';
-GRANT EXECUTE ON PROCEDURE quintor.add_transaction TO 'read_only_user'@'%';
-GRANT EXECUTE ON PROCEDURE quintor.add_MT940 TO 'read_only_user'@'%';
-
-DROP USER IF EXISTS 'treasurer'@'%';
-CREATE USER 'treasurer'@'%' IDENTIFIED BY 'treasurer123';
-GRANT SELECT, CREATE, UPDATE, DELETE, INSERT, SHOW VIEW, CREATE VIEW, TRIGGER, REFERENCES, ALTER ON quintor.* TO 'treasurer'@'%';
-GRANT EXECUTE ON PROCEDURE quintor.add_cash TO 'treasurer'@'%';
-GRANT EXECUTE ON PROCEDURE quintor.add_transaction TO 'treasurer'@'%';
-GRANT EXECUTE ON PROCEDURE quintor.add_MT940 TO 'treasurer'@'%';
-
--- 2023-04-07 07:34:26
-=======
--- 2023-07-06 22:16:45
->>>>>>> main
+-- 2023-07-03 20:38:32

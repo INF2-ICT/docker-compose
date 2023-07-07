@@ -363,7 +363,6 @@ CREATE USER 'treasurer'@'%' IDENTIFIED BY '!treasurer123';
 GRANT SELECT, CREATE, UPDATE, DELETE, INSERT, SHOW VIEW, CREATE VIEW, TRIGGER, REFERENCES, ALTER ON quintor.* TO 'treasurer'@'%';
 GRANT EXECUTE ON PROCEDURE quintor.* TO 'treasurer'@'%';
 
-<<<<<<< HEAD
 DROP USER IF EXISTS 'read_only_user'@'%';
 CREATE USER 'read_only_user'@'%' IDENTIFIED BY 'user123';
 GRANT SELECT, SHOW VIEW ON quintor.get_all_transactions TO 'read_only_user'@'%';
@@ -379,6 +378,3 @@ GRANT EXECUTE ON PROCEDURE quintor.add_transaction TO 'treasurer'@'%';
 GRANT EXECUTE ON PROCEDURE quintor.add_MT940 TO 'treasurer'@'%';
 
 -- 2023-04-07 07:34:26
-=======
--- 2023-07-06 22:16:45
->>>>>>> main
